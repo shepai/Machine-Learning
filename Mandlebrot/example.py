@@ -28,7 +28,7 @@ Create mandlebrot
 
 m = train_X.shape[1]
 n = train_X.shape[2]
- 
+
 x = np.linspace(-2, 1, num=m).reshape((1, m))
 y = np.linspace(-1, 1, num=n).reshape((n, 1))
 C = np.tile(x, (n, 1)) + 1j * np.tile(y, (1, m))
@@ -102,7 +102,7 @@ class model:
                 count+=1
         return count/len(predictions)
     def save(self,name):
-        model.save(''+name)
+        self.model.save(''+name)
 
 model_plain=model()
 model_standard=model()
@@ -111,21 +111,24 @@ model_mandle=model()
 """
 Train models
 """
+load=0
+if os.path.isdir("./plain"):
+    model_plain = tf.keras.models.load_model('./plain')
+    load+=1
+if os.path.isdir("./standard"):
+    model_standard = tf.keras.models.load_model('./standard')
+    load+=1
+if os.path.isdir("./mandle"):
+    model_mandle = tf.keras.models.load_model('./mandle')
+    load+=1
 
-if os.path.isdir("./plain.h5"):
-    model_plain = tf.keras.models.load_model('./plain.h5')
-if os.path.isdir("./standard.h5"):
-    model_standard = tf.keras.models.load_model('./standard.h5')
-if os.path.isdir("./mandle.h5"):
-    model_mandle = tf.keras.models.load_model('./mandle.h5')
-
-model_plain.train(train_X,train_y_)
-model_standard.train(X_standard_train,train_y_)
-model_mandle.train(X_mandle_train,train_y_)
-
-model_plain.save("plain")
-model_standard.save("standard")
-model_mandle.save("mandle")
+if load<3:
+    model_plain.train(train_X,train_y_)
+    model_standard.train(X_standard_train,train_y_)
+    model_mandle.train(X_mandle_train,train_y_)
+    model_plain.save("plain")
+    model_standard.save("standard")
+    model_mandle.save("mandle")
 
 """
 Test models
