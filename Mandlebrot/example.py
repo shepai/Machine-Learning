@@ -154,9 +154,6 @@ model_mandle.train(X_mandle_train,train_y_,epochs=25)
 datasets=[(test_X,test_y),(X_standard_test,test_y),(X_mandle_test,test_y)]
 data=[]
 for train,test in datasets: #loop through different sized epochs
-    model_plain=model()
-    model_standard=model()
-    model_mandle=model()
     #train based on epoch
     #test
     t=[]
@@ -164,13 +161,12 @@ for train,test in datasets: #loop through different sized epochs
     t.append(model_standard.test(train,test))
     t.append(model_mandle.test(train,test))
     data.append(t)
-#[[0.182  0.0819 0.1442]
-# [0.0623 0.1534 0.1153]
-# [0.1599 0.1118 0.1291]]
 langs = ['Unprocessed dataset','Gaussian dataset','Mandelbrot dataset']
 data=np.array(data)
 X_axis = np.arange(len(langs))
-
+print(sum(data[:, 0])/3)
+print(sum(data[:, 1])/3)
+print(sum(data[:, 2])/3)
 plt.bar(X_axis, data[:, 0], 0.2, label = 'Unprocessed')
 plt.bar(X_axis + 0.2, data[:, 1], 0.2, label = 'Gaussian')
 plt.bar(X_axis + 0.4, data[:, 2], 0.2, label = 'Mandelbrot')
