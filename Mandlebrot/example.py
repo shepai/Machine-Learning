@@ -164,10 +164,10 @@ for percent in range(10,100,10): #loop through different sized epochs
     standardData.append(model_standard.test(X_standard_test,test_y))
     mandleData.append(model_mandle.test(X_mandle_test,test_y))
 
-plt.plot([i*10 for i in range(len(plainData))],plainData,'k--', label='No preprocessing',c="g")
-plt.plot([i*10 for i in range(len(standardData))],standardData,'k:', label='Gaussian preprocessing',c="r")
-plt.plot([i*10 for i in range(len(mandleData))],mandleData,'k', label='Mandelbrot preprocessing',c="b")
-plt.title("Size of data vs ")
+plt.plot([i*10 for i in range(1,len(plainData)+1)],plainData,'k--', label='No preprocessing',c="g")
+plt.plot([i*10 for i in range(1,len(standardData)+1)],standardData,'k:', label='Gaussian preprocessing',c="r")
+plt.plot([i*10 for i in range(1,len(mandleData)+1)],mandleData,'k', label='Mandelbrot preprocessing',c="b")
+plt.title("Size of data vs accuracy")
 plt.ylabel("Accuracy")
 plt.xlabel("Percentage of dataset used for training")
 plt.legend(loc="lower right")
@@ -177,15 +177,15 @@ plt.show()
 plainData=[]
 standardData=[]
 mandleData=[]
-
-for epoch in range(40): #loop through different sized epochs
+percent=0.2
+for epoch in range(30): #loop through different sized epochs
     model_plain=model()
     model_standard=model()
     model_mandle=model()
     #train based on epoch
-    model_plain.train(train_X,train_y_,epochs=epoch)
-    model_standard.train(X_standard_train,train_y_,epochs=epoch)
-    model_mandle.train(X_mandle_train,train_y_,epochs=epoch)
+    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=epoch)
+    model_standard.train(X_standard_train[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=epoch)
+    model_mandle.train(X_mandle_train[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=epoch)
     #test
     plainData.append(model_plain.test(test_X,test_y))
     standardData.append(model_standard.test(X_standard_test,test_y))
