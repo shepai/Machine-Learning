@@ -111,15 +111,12 @@ model_mandle=model()
 """
 Train models
 """
-model_plain=None
-model_standard=None
-model_mandle=None
 
-if os.isdir("./plain.h5"):
+if os.path.isdir("./plain.h5"):
     model_plain = tf.keras.models.load_model('./plain.h5')
-if os.isdir("./standard.h5"):
+if os.path.isdir("./standard.h5"):
     model_standard = tf.keras.models.load_model('./standard.h5')
-if os.isdir("./mandle.h5"):
+if os.path.isdir("./mandle.h5"):
     model_mandle = tf.keras.models.load_model('./mandle.h5')
 
 model_plain.train(train_X,train_y_)
