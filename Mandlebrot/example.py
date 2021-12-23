@@ -29,7 +29,7 @@ Create mandlebrot
 m = train_X.shape[1]
 n = train_X.shape[2]
 
-def mandelbrot(height, width, x_from=0, x_to=0.5, y_from=0, y_to=1, max_iterations=100):
+def mandelbrot(height, width, x_from=0, x_to=0.1, y_from=0, y_to=1, max_iterations=100):
     x = np.linspace(x_from, x_to, width).reshape((1, width))
     y = np.linspace(y_from, y_to, height).reshape((height, 1))
     c = x + 1j * y
@@ -179,9 +179,9 @@ plt.ylabel("Accuracy")
 plt.xlabel("Size of batch")
 plt.legend(loc="upper right")
 plt.show()
-#74%  
-#80%
-#73%
+#61%  
+#84%
+#76%
 
 #2 find how training batch size affects the perforance
 plainData=[]
