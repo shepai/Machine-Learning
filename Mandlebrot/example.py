@@ -147,9 +147,9 @@ Experiments
 #1 find how unprocessed data effects the models
 percent=0.4
 
-model_plain.train(train_X,train_y_)
-model_standard.train(X_standard_train,train_y_)
-model_mandle.train(X_mandle_train,train_y_)
+model_plain.train(train_X,train_y_,epochs=25)
+model_standard.train(X_standard_train,train_y_,epochs=25)
+model_mandle.train(X_mandle_train,train_y_,epochs=25)
 
 datasets=[(test_X,test_y),(X_standard_test,test_y),(X_mandle_test,test_y)]
 data=[]
@@ -164,14 +164,16 @@ for train,test in datasets: #loop through different sized epochs
     t.append(model_standard.test(train,test))
     t.append(model_mandle.test(train,test))
     data.append(t)
-
+#[[0.182  0.0819 0.1442]
+# [0.0623 0.1534 0.1153]
+# [0.1599 0.1118 0.1291]]
 langs = ['Unprocessed dataset','Gaussian dataset','Mandelbrot dataset']
-  
+data=np.array(data)
 X_axis = np.arange(len(langs))
-  
-plt.bar(X_axis - 0.2, data[:, 0], 0.4, label = 'Unprocessed')
-plt.bar(X_axis + 0.2, data[:, 1], 0.4, label = 'Gaussian')
-plt.bar(X_axis + 0.2, data[:, 2], 0.4, label = 'Mandelbrot')
+
+plt.bar(X_axis, data[:, 0], 0.2, label = 'Unprocessed')
+plt.bar(X_axis + 0.2, data[:, 1], 0.2, label = 'Gaussian')
+plt.bar(X_axis + 0.4, data[:, 2], 0.2, label = 'Mandelbrot')
 
 plt.xticks(X_axis, langs)
 plt.title("How models perform on alternative datasets")
@@ -190,9 +192,9 @@ for i in range(5,50,5): #loop through different sized epochs
     model_standard=model()
     model_mandle=model()
     #train based on epoch
-    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],batch=i)
-    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],batch=i)
-    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],batch=i)
+    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=10,batch=i)
+    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],epochs=10,batch=i)
+    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],epochs=10,batch=i)
     #test
     plainData.append(model_plain.test(test_X,test_y))
     standardData.append(model_standard.test(X_standard_test,test_y))
