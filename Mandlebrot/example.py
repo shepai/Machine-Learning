@@ -90,10 +90,9 @@ class model:
         #model.add(Dense(10, activation='relu'))
         self.model.add(Dense(outcomes, activation='sigmoid')) #sigmoid is good for binary
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.compile(loss="binary_crossentropy",optimizer="adam",metrics=['accuracy'])
 
-    def train(self,x,y,epochs=30):
-        history=self.model.fit(x,y,batch_size=32,epochs=epochs,validation_split=0.1)
+    def train(self,x,y,epochs=30,batch=32):
+        history=self.model.fit(x,y,batch_size=batch,epochs=epochs,validation_split=0.1)
         self.history = history.history #gather training log
 
     def test(self,X,y):
@@ -145,7 +144,70 @@ print(p1,p2,p3)
 """
 Experiments
 """
-#1 find how training data effects the perforance
+#1 find how unprocessed data effects the models
+percent=0.4
+
+model_plain.train(train_X,train_y_)
+model_standard.train(X_standard_train,train_y_)
+model_mandle.train(X_mandle_train,train_y_)
+
+datasets=[(test_X,test_y),(X_standard_test,test_y),(X_mandle_test,test_y)]
+data=[]
+for train,test in datasets: #loop through different sized epochs
+    model_plain=model()
+    model_standard=model()
+    model_mandle=model()
+    #train based on epoch
+    #test
+    t=[]
+    t.append(model_plain.test(train,test))
+    t.append(model_standard.test(train,test))
+    t.append(model_mandle.test(train,test))
+    data.append(t)
+
+langs = ['Unprocessed dataset','Gaussian dataset','Mandelbrot dataset']
+  
+X_axis = np.arange(len(langs))
+  
+plt.bar(X_axis - 0.2, data[:, 0], 0.4, label = 'Unprocessed')
+plt.bar(X_axis + 0.2, data[:, 1], 0.4, label = 'Gaussian')
+plt.bar(X_axis + 0.2, data[:, 2], 0.4, label = 'Mandelbrot')
+
+plt.xticks(X_axis, langs)
+plt.title("How models perform on alternative datasets")
+plt.ylabel("Accuracy")
+plt.xlabel("Size of batch")
+plt.legend(loc="upper right")
+plt.show()
+
+#2 find how training batch size affects the perforance
+plainData=[]
+standardData=[]
+mandleData=[]
+percent=0.4
+for i in range(5,50,5): #loop through different sized epochs
+    model_plain=model()
+    model_standard=model()
+    model_mandle=model()
+    #train based on epoch
+    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],batch=i)
+    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],batch=i)
+    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],batch=i)
+    #test
+    plainData.append(model_plain.test(test_X,test_y))
+    standardData.append(model_standard.test(X_standard_test,test_y))
+    mandleData.append(model_mandle.test(X_mandle_test,test_y))
+
+plt.plot([i for i in range(5,50,5)],plainData,'k--', label='No preprocessing',c="g")
+plt.plot([i for i in range(5,50,5)],standardData,'k:', label='Gaussian preprocessing',c="r")
+plt.plot([i for i in range(5,50,5)],mandleData,'k', label='Mandelbrot preprocessing',c="b")
+plt.title("Batch size")
+plt.ylabel("Accuracy")
+plt.xlabel("Size of batch")
+plt.legend(loc="lower right")
+plt.show()
+
+#3 find how training data effects the perforance
 plainData=[]
 standardData=[]
 mandleData=[]
@@ -173,7 +235,7 @@ plt.xlabel("Percentage of dataset used for training")
 plt.legend(loc="lower right")
 plt.show()
 
-#2 find how epochs affect the performance
+#4 find how epochs affect the performance
 plainData=[]
 standardData=[]
 mandleData=[]
