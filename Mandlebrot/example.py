@@ -143,8 +143,37 @@ print(p1,p2,p3)
 """
 
 """
-Experiment
+Experiments
 """
+#1 find how training data effects the perforance
+plainData=[]
+standardData=[]
+mandleData=[]
+
+for percent in range(10,100,10): #loop through different sized epochs
+    percent/=100 #make percentage
+    model_plain=model()
+    model_standard=model()
+    model_mandle=model()
+    #train based on epoch
+    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=10)
+    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],epochs=10)
+    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],epochs=10)
+    #test
+    plainData.append(model_plain.test(test_X,test_y))
+    standardData.append(model_standard.test(X_standard_test,test_y))
+    mandleData.append(model_mandle.test(X_mandle_test,test_y))
+
+plt.plot([i*10 for i in range(len(plainData))],plainData,'k--', label='No preprocessing',c="g")
+plt.plot([i*10 for i in range(len(standardData))],standardData,'k:', label='Gaussian preprocessing',c="r")
+plt.plot([i*10 for i in range(len(mandleData))],mandleData,'k', label='Mandelbrot preprocessing',c="b")
+plt.title("Size of data vs ")
+plt.ylabel("Accuracy")
+plt.xlabel("Percentage of dataset used for training")
+plt.legend(loc="lower right")
+plt.show()
+
+#2 find how epochs affect the performance
 plainData=[]
 standardData=[]
 mandleData=[]
@@ -155,8 +184,8 @@ for epoch in range(40): #loop through different sized epochs
     model_mandle=model()
     #train based on epoch
     model_plain.train(train_X,train_y_,epochs=epoch)
-    model_standard.train(train_X,train_y_,epochs=epoch)
-    model_mandle.train(train_X,train_y_,epochs=epoch)
+    model_standard.train(X_standard_train,train_y_,epochs=epoch)
+    model_mandle.train(X_mandle_train,train_y_,epochs=epoch)
     #test
     plainData.append(model_plain.test(test_X,test_y))
     standardData.append(model_standard.test(X_standard_test,test_y))
