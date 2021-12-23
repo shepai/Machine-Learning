@@ -94,11 +94,10 @@ class model:
         assert len(X)==len(y), "Error, the arrays do not match length"
         predictions = self.model.predict(X)
         count=0
-        print(predictions[0])
-        predictions=np.argmax(predictions)
-        print(predictions.shape,predictions[0])
+
         for i in range(len(predictions)):
-            if y[i]==predictions[i]:
+            pred=np.argmax(predictions[i])
+            if y[i]==pred:
                 count+=1
         return count/len(predictions)
     def save(self,name):
@@ -113,13 +112,13 @@ Train models
 """
 load=0
 if os.path.isdir("./plain"):
-    model_plain = tf.keras.models.load_model('./plain')
+    model_plain.model = tf.keras.models.load_model('./plain')
     load+=1
 if os.path.isdir("./standard"):
-    model_standard = tf.keras.models.load_model('./standard')
+    model_standard.model = tf.keras.models.load_model('./standard')
     load+=1
 if os.path.isdir("./mandle"):
-    model_mandle = tf.keras.models.load_model('./mandle')
+    model_mandle.model = tf.keras.models.load_model('./mandle')
     load+=1
 
 if load<3:
