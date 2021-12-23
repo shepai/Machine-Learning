@@ -11,7 +11,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
 import os
-
+from matplotlib import pyplot as plt
 """
 Gather data from MNIST
 """
@@ -29,9 +29,12 @@ Create mandlebrot
 m = train_X.shape[1]
 n = train_X.shape[2]
 
-x = np.linspace(-2, 1, num=m).reshape((1, m))
-y = np.linspace(-1, 1, num=n).reshape((n, 1))
-C = np.tile(x, (n, 1)) + 1j * np.tile(y, (1, m))
+def mandelbrot(height, width, x_from=0, x_to=1, y_from=0, y_to=1, max_iterations=100):
+    x = np.linspace(x_from, x_to, width).reshape((1, width))
+    y = np.linspace(y_from, y_to, height).reshape((height, 1))
+    c = x + 1j * y
+    return c
+C=mandelbrot(28,28)
 
 """
 Normalize datasets
@@ -50,12 +53,15 @@ X_mandle_train = []
 X_mandle_test = []
 
 for im in train_X:
-    X_mandle_train.append(np.dot(C,im))
+    X_mandle_train.append(np.multiply(C,im))
 for im in test_X:
-    X_mandle_test.append(np.dot(C,im))
+    X_mandle_test.append(np.multiply(C,im))
 #convert to numpy
 X_mandle_train=np.array(X_mandle_train)
 X_mandle_test=np.array(X_mandle_test)
+X_mandle_train=X_mandle_train.astype(float)
+X_mandle_test=X_mandle_test.astype(float)
+
 
 """
 Reshape data for neural network
@@ -109,31 +115,58 @@ model_mandle=model()
 
 """
 Train models
-"""
-load=0
+
+
 if os.path.isdir("./plain"):
     model_plain.model = tf.keras.models.load_model('./plain')
-    load+=1
+else:
+    model_plain.train(train_X,train_y_)
+    model_plain.save("plain")
 if os.path.isdir("./standard"):
     model_standard.model = tf.keras.models.load_model('./standard')
-    load+=1
+else:
+    model_standard.train(X_standard_train,train_y_)
+    model_standard.save("standard")
 if os.path.isdir("./mandle"):
     model_mandle.model = tf.keras.models.load_model('./mandle')
-    load+=1
-
-if load<3:
-    model_plain.train(train_X,train_y_)
-    model_standard.train(X_standard_train,train_y_)
+else:
     model_mandle.train(X_mandle_train,train_y_)
-    model_plain.save("plain")
-    model_standard.save("standard")
     model_mandle.save("mandle")
 
-"""
 Test models
-"""
+
 p1=model_plain.test(test_X,test_y)
 p2=model_standard.test(X_standard_test,test_y)
 p3=model_mandle.test(X_mandle_test,test_y)
 
 print(p1,p2,p3)
+"""
+
+"""
+Experiment
+"""
+plainData=[]
+standardData=[]
+mandleData=[]
+
+for epoch in range(40): #loop through different sized epochs
+    model_plain=model()
+    model_standard=model()
+    model_mandle=model()
+    #train based on epoch
+    model_plain.train(train_X,train_y_,epochs=epoch)
+    model_standard.train(train_X,train_y_,epochs=epoch)
+    model_mandle.train(train_X,train_y_,epochs=epoch)
+    #test
+    plainData.append(model_plain.test(test_X,test_y))
+    standardData.append(model_standard.test(X_standard_test,test_y))
+    mandleData.append(model_mandle.test(X_mandle_test,test_y))
+
+plt.plot([i for i in range(len(plainData))],plainData,'k--', label='No preprocessing',c="g")
+plt.plot([i for i in range(len(standardData))],standardData,'k:', label='Gaussian preprocessing',c="r")
+plt.plot([i for i in range(len(mandleData))],mandleData,'k', label='Mandelbrot preprocessing',c="b")
+plt.title("The role of epochs to determining the accuracy of preprocessing methods on unseen data")
+plt.ylabel("Accuracy")
+plt.xlabel("Epoch number")
+plt.legend(loc="lower right")
+plt.show()
