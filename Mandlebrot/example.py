@@ -34,7 +34,7 @@ def mandelbrot(height, width, x_from=0, x_to=0.1, y_from=0, y_to=1, max_iteratio
     y = np.linspace(y_from, y_to, height).reshape((height, 1))
     c = x + 1j * y
     return c
-C=mandelbrot(28,28)
+C=mandelbrot(1,28*28).reshape(28,28)
 
 """
 Normalize datasets
@@ -183,6 +183,9 @@ plt.show()
 #84%
 #76%
 
+#62
+#86
+#78.5
 #2 find how training batch size affects the perforance
 plainData=[]
 standardData=[]

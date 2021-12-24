@@ -33,9 +33,11 @@ n = train_X.shape[2]
 def mandelbrot(height, width, x_from=0, x_to=0.1, y_from=0, y_to=1, max_iterations=100):
     x = np.linspace(x_from, x_to, width).reshape((1, width))
     y = np.linspace(y_from, y_to, height).reshape((height, 1))
-    c = x + 1j * y
+    c=None
+    for i in range(max_iterations):
+        c = x + 1j * y
     return c
-C=mandelbrot(28,28)
+C=mandelbrot(1,28*28).reshape(28,28)
 
 """
 Normalize datasets
@@ -67,7 +69,12 @@ w = 28
 h = 28
 columns = 3
 rows = 1
-for i in range(10):
+print(C.shape)
+print(C.astype(float))
+for i in range(1):
+    plt.imshow(C.astype(float))
+    plt.show()
+
     fig = plt.figure()
     fig.add_subplot(rows, columns, 1)
     plt.imshow(train_X[i])
