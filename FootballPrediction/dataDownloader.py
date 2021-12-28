@@ -8,9 +8,10 @@ Code by Dexter R Shepherd, aged 20
 
 from xml.etree import ElementTree as ET
 import json
+from matplotlib import pyplot as plt
 
 class downloader:
-    def __init__(self,name="playerData.xml",Doc_360="360Data.json"):
+    def __init__(self,name="playerData.xml",Doc_360="360Data.json",show=True):
         tree = ET.parse(name)
         root = tree.getroot()
         self.struct={}
@@ -33,6 +34,7 @@ class downloader:
                                    print(self.struct[player])
         #create table
         self.TABLE=[]
+        events={}
         #TABLE entry [player, zone, pressure, distance of shot, success, foot]      
         #gather 360 data
         file=open(Doc_360) #read file
@@ -40,10 +42,27 @@ class downloader:
         file.close()
         moves = json.loads(r) #convert to dictionary
         for event in moves:
-            for key in event:
-                print(key,event[key])
-            break
-        
+            id=event['event_uuid']
+            area=event['visible_area']
+            people=event['freeze_frame']
+            loc=[]
+            for person in people:
+                coord=person['location']
+                if person['actor']: #player with ball
+                    loc=coord
+                    plt.scatter(coord[0],coord[1],c="y")
+                elif person['teammate']: #teammate
+                    plt.scatter(coord[0],coord[1],c="g")
+                else: #enemy
+                    plt.scatter(coord[0],coord[1],c="r")
+                
+            if show: #only show if parameter allows
+                plt.xlim([0, 100])
+                plt.ylim([0, 100])
+                plt.show()
+            events[id]=loc
+            
+
        
                                     
                    
