@@ -21,10 +21,18 @@ class downloader:
                                name=player.find('Name').text
                                position=player.find('Position').text
                                print(name,position)
-                               data=[]
-                               for i in player.findall("Stat"):
-                                   data.append(i.text)
-                               print(data)
+                               struct={}
+                               for i,dat in enumerate(player.findall("Stat")):
+                                   struct[dat.attrib['Type']]=dat.text
+                               print(struct)
                                     
                    
 downloader()
+
+
+"""
+Example:
+Maxime Pelican Forward
+['Maxime', 'Pelican', 'France', '1998-05-12', '65', '178', 'Unknown', 'Unknown', 'Unknown', '2016-07-01', '2017-01-09', 'France U20', 'France']
+
+"""
