@@ -14,7 +14,7 @@ import pandas as pd
 import math as maths
 
 class downloader:
-    def __init__(self,name="playerData.xml",Doc_360="360Data.json",show=True,Type='pass'):
+    def __init__(self,name="playerData.xml",Doc_360="360Data.json",show=True,Type='pass',maxData=10):
         comps = sb.Competitions()
         json_data = comps.data
         df = comps.get_dataframe()
@@ -46,11 +46,11 @@ class downloader:
                         df = events.get_dataframe(event_type=Type)
                         tableOfData.append(df)
                         ##print(len(df))  # 23
-                        if i>10:
+                        if i>maxData:
                             break
             except KeyError: #stop errors by ignoring them
                     pass
-            if k>5:
+            if k>maxData:
                 break
         print(len(tableOfData))
         self.tableOfData=tableOfData
@@ -184,7 +184,12 @@ class downloader:
         medAllWeight=medPasses/all
         longAllWeight=longPasses/all
 
-        
+        averageP=round((((player['short']*shortWeight)+
+                                   (player['medium']*medWeight)+
+                                    (player['long']*longWeight))/3)*100,ndigits=ndig)
+        averageA=round((((self.shortAverage*shortAllWeight)+
+                                   (self.mediumAverage*medAllWeight)+
+                                    (self.longAverage*longAllWeight))/3)*100,ndigits=ndig)
         if view: #output if wanted
             print(playerName,"performance")
             
@@ -199,26 +204,25 @@ class downloader:
             print("long Xpass:",round(100*self.longAverage,ndigits=ndig),"%")
             print("player long actual:",round(100*player['long'],ndigits=ndig),"%")
             print("result",round((player['long']-self.longAverage)*100,ndigits=ndig),"%")
-            averageP=round((((player['short']*shortWeight)+
-                                   (player['medium']*medWeight)+
-                                    (player['long']*longWeight))/3)*100,ndigits=ndig)
-            averageA=round((((self.shortAverage*shortAllWeight)+
-                                   (self.mediumAverage*medAllWeight)+
-                                    (self.longAverage*longAllWeight))/3)*100,ndigits=ndig)
+            
             print("average performance",averageP-averageA,"%")
-        return player['short']-self.shortAverage,player['medium']-self.mediumAverage,player['long']-self.longAverage
-
+        return averageP-averageA
+    def sortPlayers(self,direction=None,body_part=None,Type=None,pressureCare=None):
+        #sort all the players based on parameters from worst to best
+        self.sort(direction=None,body_part=None,Type=None,pressureCare=None)
+        scores={}
+        for player in self.players:
+            score=self.getPlayerPerformance(player,view=False)
+            scores[player]=score
+        players={k: v for k, v in sorted(scores.items(), key=lambda item: item[1])}
+        return players
 d=downloader()
 d.sort()
 #'Jordan Brian Henderson'
 print("All data\n")
 d.getPlayerPerformance('Jordan Brian Henderson')
 
-print("Type\n\n")
-d.sort(pressureCare=True)
-#'Jordan Brian Henderson'
-d.getPlayerPerformance('Jordan Brian Henderson')
-
+d.sortPlayers()
 
 """
 Example:
