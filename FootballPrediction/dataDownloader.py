@@ -58,8 +58,16 @@ class downloader:
         self.mediumAverage=0
         self.longAverage=0
         self.players={}
+        self.weightings={}
+        self.values={}
     def sort(self,zone=[],direction=None,body_part=None,Type=None,pressureCare=None):
+        #rewrite all data
+        self.shortAverage=0
+        self.mediumAverage=0
+        self.longAverage=0
+        self.players={}
         players={}
+        self.weightings={}
         values={'short':{'kick':0,'success':0},'long':
                     {'kick':0,'success':0},'medium':{'kick':0,'success':0}}
         SHORT=15 #short up to
@@ -68,11 +76,14 @@ class downloader:
             df=pd.DataFrame(data)
             for i, row in df.iterrows():
                 #gather data
-                
                 name=row['player']
                 pressure=row['under_pressure']
                 outcome=row['outcome']
                 body=row['body_part']
+                through_ball=row['through_ball']
+                cross=row['cross']
+                cut=row['cut_back']
+                switch=row['switch']
                 proceed=True
                 if (pressureCare!=None): #check parameters are met
                     if pressure==True and pressureCare==True:
@@ -81,8 +92,17 @@ class downloader:
                         proceed=True
                     else:
                         proceed=False
-                if body_part!=None:
+                if body_part!=None: #check body part match is needed
                     if body_part!=body:
+                        proceed=False
+                if Type!=None: #check type match is needed
+                    if not(Type=='through_ball' and through_ball==True):
+                        proceed=False
+                    elif not(Type=='cross' and cross==True):
+                        proceed=False
+                    elif not(Type=='cut_back' and cut==True):
+                        proceed=False
+                    elif not(Type=='switch' and switch==True):
                         proceed=False
                 if proceed: #if parameters are met
                     if outcome!='Injury Clearance' and outcome!='Pass Offside':
@@ -117,11 +137,17 @@ class downloader:
                         tmp['kick']+=1
                         tmp['success']+=successValue
                         values[size]=tmp
+        #calculate overall averages
+        if values['short']['kick']>0:
+            self.shortAverage=values['short']['success']/values['short']['kick']
+        if values['medium']['kick']>0:
+            self.mediumAverage=values['medium']['success']/values['medium']['kick']
+        if values['long']['kick']>0:
+            self.longAverage=values['long']['success']/values['long']['kick']
+        self.values={'short':values['short']['kick'],'medium':values['medium']['kick'],'long':values['long']['kick']}
         
-        self.shortAverage=values['short']['success']/values['short']['kick']
-        self.mediumAverage=values['medium']['success']/values['medium']['kick']
-        self.longAverage=values['long']['success']/values['long']['kick']
-        
+        #calculate player averages
+        self.weightings=players
         for player in players: #prganise performances
             short=players[name]['short']
             med=players[name]['medium']
@@ -134,32 +160,62 @@ class downloader:
                 self.players[player]['medium']=med['success']/med['kick']
             if long['kick']>0:
                 self.players[player]['long']=long['success']/long['kick']
-    def getPlayerPerformance(self,playerName,view=True):
-        assert self.players.get(playerName,False)!=False, "Player does not exist"
+    def getPlayerPerformance(self,playerName,view=True,ndig=1):
+        assert self.players.get(playerName,False)!=False, "Player does not match the sort, so is not in the data"
         player=self.players[playerName]
+        #gather weightings for player
+        weight=self.weightings[playerName]
+        shortPasses=weight['short']['kick']
+        medPasses=weight['medium']['kick']
+        longPasses=weight['long']['kick']
+        all=shortPasses+medPasses+longPasses
+        #weight=passes/allpasses
+        shortWeight=shortPasses/all
+        medWeight=medPasses/all
+        longWeight=longPasses/all
+
+        #gather weighting's for all
+        shortPasses=self.values['short']
+        medPasses=self.values['medium']
+        longPasses=self.values['long']
+        all=shortPasses+medPasses+longPasses
+        #weight=passes/allpasses
+        shortAllWeight=shortPasses/all
+        medAllWeight=medPasses/all
+        longAllWeight=longPasses/all
+
+        
         if view: #output if wanted
             print(playerName,"performance")
             
-            print("short Xpass:",self.shortAverage)
-            print("player short Xpass:",player['short'])
-            print("result",player['short']-self.shortAverage)
+            print("short Xpass:",round(100*self.shortAverage,ndigits=ndig),"%")
+            print("player short actual:",round(100*player['short'],ndigits=ndig),"%")
+            print("result",round((player['short']-self.shortAverage)*100,ndigits=ndig),"%")
             
-            print("medium Xpass:",self.mediumAverage)
-            print("player medium Xpass:",player['medium'])
-            print("result",player['medium']-self.mediumAverage)
+            print("medium Xpass:",round(100*self.mediumAverage,ndigits=ndig),"%")
+            print("player medium actual:",round(player['medium']*100,ndigits=ndig),"%")
+            print("result",round((player['medium']-self.mediumAverage)*100,ndigits=ndig),"%")
             
-            print("long Xpass:",self.longAverage)
-            print("player long Xpass:",player['long'])
-            print("result",player['long']-self.longAverage)
+            print("long Xpass:",round(100*self.longAverage,ndigits=ndig),"%")
+            print("player long actual:",round(100*player['long'],ndigits=ndig),"%")
+            print("result",round((player['long']-self.longAverage)*100,ndigits=ndig),"%")
+            averageP=round((((player['short']*shortWeight)+
+                                   (player['medium']*medWeight)+
+                                    (player['long']*longWeight))/3)*100,ndigits=ndig)
+            averageA=round((((self.shortAverage*shortAllWeight)+
+                                   (self.mediumAverage*medAllWeight)+
+                                    (self.longAverage*longAllWeight))/3)*100,ndigits=ndig)
+            print("average performance",averageP-averageA,"%")
         return player['short']-self.shortAverage,player['medium']-self.mediumAverage,player['long']-self.longAverage
 
 d=downloader()
-d.sort(body_part='Right Foot',pressureCare=True)
-#'Jordan Brian Henderson'
-print("Under pressure\n")
-d.getPlayerPerformance('Jordan Brian Henderson')
 d.sort()
-print("All pressure\n\n")
+#'Jordan Brian Henderson'
+print("All data\n")
+d.getPlayerPerformance('Jordan Brian Henderson')
+
+print("Type\n\n")
+d.sort(pressureCare=True)
 #'Jordan Brian Henderson'
 d.getPlayerPerformance('Jordan Brian Henderson')
 
