@@ -216,6 +216,8 @@ class downloader:
             scores[player]=score
         players={k: v for k, v in sorted(scores.items(), key=lambda item: item[1])}
         return players
+    def get_feet(self):
+        self.sort(        
 d=downloader()
 d.sort()
 #'Jordan Brian Henderson'
