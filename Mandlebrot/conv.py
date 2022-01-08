@@ -96,7 +96,7 @@ class model:
         self.model.add(Dense(outcomes, activation='sigmoid')) #sigmoid is good for binary
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    def train(self,x,y,epochs=30,batch=32):
+    def train(self,x,y,epochs=5,batch=32):
         history=self.model.fit(x,y,batch_size=batch,epochs=epochs,validation_split=0.1)
         self.history = history.history #gather training log
 
@@ -125,9 +125,9 @@ Experiments
 #1 find how unprocessed data effects the models
 percent=0.4
 
-model_plain.train(train_X,train_y_,epochs=25)
-model_standard.train(X_standard_train,train_y_,epochs=25)
-model_mandle.train(X_mandle_train,train_y_,epochs=25)
+model_plain.train(train_X,train_y_,epochs=5)
+model_standard.train(X_standard_train,train_y_,epochs=5)
+model_mandle.train(X_mandle_train,train_y_,epochs=5)
 
 datasets=[(test_X,test_y),(X_standard_test,test_y),(X_mandle_test,test_y)]
 data=[]
@@ -224,7 +224,7 @@ plainData=[]
 standardData=[]
 mandleData=[]
 percent=0.2
-for epoch in range(30): #loop through different sized epochs
+for epoch in range(15): #loop through different sized epochs
     model_plain=model()
     model_standard=model()
     model_mandle=model()
