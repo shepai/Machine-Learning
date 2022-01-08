@@ -202,9 +202,9 @@ for percent in range(10,100,10): #loop through different sized epochs
     model_standard=model()
     model_mandle=model()
     #train based on epoch
-    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=10)
-    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],epochs=10)
-    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],epochs=10)
+    model_plain.train(train_X[0:int(len(train_X)*percent)],train_y_[0:int(len(train_X)*percent)],epochs=4)
+    model_standard.train(X_standard_train[0:int(len(X_standard_train)*percent)],train_y_[0:int(len(X_standard_train)*percent)],epochs=4)
+    model_mandle.train(X_mandle_train[0:int(len(X_mandle_train)*percent)],train_y_[0:int(len(X_mandle_train)*percent)],epochs=4)
     #test
     plainData.append(model_plain.test(test_X,test_y))
     standardData.append(model_standard.test(X_standard_test,test_y))
