@@ -13,6 +13,28 @@ import statsbomb as sb
 import pandas as pd
 import math as maths
 
+class Zones:
+    #create the zones for the stadium and set the square size of each
+    def __init__(self,x=130,y=80,barrier=10):
+        self.x=x
+        self.y=y
+        self.b=barrier
+        self.grid=[]
+        counter=0
+        for i in range(0,self.x,self.b): #create grid square with unique numbers
+            a=[]
+            for j in range(0,self.y,self.b):
+                a.append(counter)
+                counter+=1
+            self.grid.append(a)
+        
+    def getZone(self,x,y): #retur the number of the zone
+        ind=[]
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[0])):
+                if (x>=i or x<i+self.b) and (y>=j or y<j+self.b):
+                    ind=self.grid[i][j]
+        return ind
 class downloader:
     def __init__(self,name="playerData.xml",Doc_360="360Data.json",show=True,Type='pass',maxData=10):
         comps = sb.Competitions()
@@ -60,6 +82,10 @@ class downloader:
         self.players={}
         self.weightings={}
         self.values={}
+        self.minX=0
+        self.minY=0
+        self.maxX=0
+        self.maxY=0
     def sort(self,zone=[],direction=None,body_part=None,Type=None,pressureCare=None):
         #rewrite all data
         self.shortAverage=0
@@ -72,6 +98,7 @@ class downloader:
                     {'kick':0,'success':0},'medium':{'kick':0,'success':0}}
         SHORT=15 #short up to
         MED=40 #medium up to
+
         for data in self.tableOfData:
             df=pd.DataFrame(data)
             for i, row in df.iterrows():
@@ -111,6 +138,8 @@ class downloader:
                         y1=row['start_location_y']
                         x2=row['end_location_x']
                         y2=row['end_location_y']
+                        if y1>self.maxY or y2>self.maxY: self.maxY=max(y1,y2)
+                        if x1>self.maxX or x2>self.maxX: self.maxX=max(x1,x2)
                         zone=None
                         dist=int(maths.sqrt((x1-x2)**2 +(y1-y2)**2)) #calculate distance
                         size=""
@@ -217,7 +246,8 @@ class downloader:
         players={k: v for k, v in sorted(scores.items(), key=lambda item: item[1])}
         return players
     def get_feet(self):
-        self.sort(        
+        #self.sort(  
+        pass      
 d=downloader()
 d.sort()
 #'Jordan Brian Henderson'
@@ -225,7 +255,11 @@ print("All data\n")
 d.getPlayerPerformance('Jordan Brian Henderson')
 
 d.sortPlayers()
+print(d.maxX,d.maxY)
 
+z=Zones()
+print(z.getZone(0,0))
+print(z.getZone(100,5))
 """
 Example:
 Maxime Pelican Forward
